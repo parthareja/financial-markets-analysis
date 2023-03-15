@@ -3,6 +3,37 @@ from candle import Candle
 from scan import Scan
 
 
+class Main:
+    def __init__():
+        pass
+
+    
+    def getScanAnalysis():
+
+    #     class Data:
+    # def __init__(self, index, period, interval = None)
+
+
+
+        dataObj = Data('NIFTY50', '1mo')
+        dataframe, _tickers = dataObj.getData()
+        objCandle = []
+        for ticker in _tickers:
+            objCandle.append(Candle(dataframe, ticker))
+        
+        return Scan(objCandle).scan()
+
+
+    def getVolAnalysis():
+        pass
+
+
+    def getPrediction():
+        pass
+
+
+    def getBackTest():
+        pass
 
 
 # def main(tickers):
@@ -30,22 +61,3 @@ print(Scan(objCandle).scan())
 
 # main(tickers)
 
-
-
-class Main:
-    def __init__():
-        pass
-
-    
-    def getCandlestickPatternAnalysis():
-        dataObj = Data('NIFTY50', '1mo')
-        dataframe, _tickers = dataObj.getData()
-        objCandle = []
-        for ticker in _tickers:
-            objCandle.append(Candle(dataframe, ticker))
-        Scan(objCandle).scan()
-
-        pass
-
-    def getVolAnalysis():
-        pass

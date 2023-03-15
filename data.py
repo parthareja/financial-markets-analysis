@@ -14,10 +14,10 @@ class Data:
             _url = 'https://www1.nseindia.com/content/indices/ind_nifty50list.csv'
         elif self.index == 'BANKNIFTY':
             _url = 'https://www1.nseindia.com/content/indices/ind_niftybanklist.csv'
-        elif self.index == 'NIFTYFINSERVICE':
+        elif self.index == 'FINNIFTY':
             _url = 'https://www1.nseindia.com/content/indices/ind_niftyfinancelist.csv'
-        # elif self.index == 'NIFTYMIDCAPSELECT': #####???????????????????????????????????????
-            # _url = ''
+        # elif self.index == 'MIDCAPNIFTY': #####???????????????????????????????????????
+            # _url = 'https://www1.nseindia.com/content/indices/ind_niftymidcapselect_list.csv'
         else:
             exit()
         _df = pd.read_csv(_url)
