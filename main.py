@@ -8,15 +8,11 @@ class Main:
         pass
 
     
-    def getScanAnalysis():
+    def getScanAnalysis(index, period, interval):
 
-    #     class Data:
-    # def __init__(self, index, period, interval = None)
-
-
-
-        dataObj = Data('NIFTY50', '1mo')
+        dataObj = Data(index, period, True, interval)
         dataframe, _tickers = dataObj.getData()
+        
         objCandle = []
         for ticker in _tickers:
             objCandle.append(Candle(dataframe, ticker))
@@ -24,7 +20,13 @@ class Main:
         return Scan(objCandle).scan()
 
 
-    def getVolAnalysis():
+    def getVolAnalysis(index, period, interval):
+
+        dataObj = Data(index, period, False, interval)
+        df = dataObj.getData()
+
+
+        # return df
         pass
 
 
@@ -32,32 +34,8 @@ class Main:
         pass
 
 
-    def getBackTest():
+    def getBacktest():
         pass
 
-
-# def main(tickers):
-# tickers = ['HDFCBANK.NS', 'TCS.NS', 'ADANIPORTS.NS', 'APOLLOHOSP.NS', 'ASIANPAINT.NS', 'AXISBANK.NS']
-
-dataObj = Data('NIFTY50', '1mo')
-dataframe, _tickers = dataObj.getData()
-# data = data.fetchData()
-
-# data = Data.transformData(data)
-
-objCandle = []
-for ticker in _tickers:
-    objCandle.append(Candle(dataframe, ticker))
-    # objCandle.append(Candle(dataframe[ticker], ticker))
-
-
-    
-print()
-print()
-print()
-print(Scan(objCandle).scan())
-
-
-
-# main(tickers)
-
+    def getStrategyOptimization():
+        pass
