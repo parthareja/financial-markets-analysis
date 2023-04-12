@@ -23,9 +23,12 @@ class Scan:
         
         b = self.pt3()
         a = self.pattern2()
+        c = self.test()
 
         if self.pt3():
             scanDictBull['Pattern3'] = self.pt3()
+        if c:
+            scanDictBull['TEST'] = c
         if self.pattern2():
             scanDictBull['Pattern2'] = self.pattern2()
 
@@ -37,6 +40,13 @@ class Scan:
             if (obj.high(0) - obj.low(0)) < (obj.open(-1) - obj.close(-1)):
                 existsArr.append(obj.ticker)
 
+        return existsArr
+    
+    def test(self):
+        existsArr = []
+        for obj in self.objCandle:
+            if obj.open(0) == obj.high(0):
+                existsArr.append(obj.ticker)
         return existsArr
         # pass
 
