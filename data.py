@@ -93,3 +93,32 @@ class Data:
     def _transformData(self, data): 
         # transform as per requirements, the pandas dataframe
         return data
+    
+
+    def _getVolumes(self, _tickers):
+        _tickers = self._getTickers()
+        _tickers.pop(0)
+
+        _dictVolumes = {}
+        _dictSMAVolumes = {}
+        
+        _df = yf.download(_tickers, threads=True, period=f'{self.period}d', progress=False)
+        _df.drop(['Adj Close', 'Close', 'High', 'Low', 'Open'], inplace = True, axis = 1)
+
+        for i in _df:
+            _df[(f'{self.period}d-SMA Volume', i[1])] = _df[[i]].rolling(self.period).mean()
+
+        for i in _df:
+            if i[0] == 'Volume':
+                _dictVolumes.update({i[1]: _df[i].iat[-1]})
+            else:
+                _dictSMAVolumes.update({i[1]: _df[i].iat[-1]})        
+        
+        return _dictVolumes, _dictSMAVolumes
+    
+
+    def _getWeights(self, _tickers):
+        _dictWeights = {}
+
+        return _dictWeights
+
