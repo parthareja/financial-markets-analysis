@@ -60,7 +60,7 @@ class Data:
             _ownTicker = '^NSEBANK'
         elif self.symbol == 'FINNIFTY':
             _url = 'https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20FINANCIAL%20SERVICES'
-            _ownTicker = 0 # yet to be added: index symbol
+            _ownTicker = 0 # index symbol not added as only 1d data available fetched
         # elif self.index == 'MIDCAPNIFTY': #####???????????????????????????????????????  # add to indicesArr as well
             # _url = 'https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20MIDCAP%20SELECT'
             # _ownTicker = 0 # yet to be added: index symbol
@@ -78,14 +78,15 @@ class Data:
         else: 
             _tickers.pop(0)
 
+      
         return _tickers
 
 
     def _fetchData(self, tickersArr):
         if self.interval != None: 
-            data = yf.download(tickersArr, period = self.period, interval = self.interval, threads = True, group_by = 'ticker', progress = False)
+            data = yf.download(tickersArr, period = f'{self.period}d', interval = self.interval, threads = True, group_by = 'ticker', progress = False)
         else:
-            data = yf.download(tickersArr, period = self.period, threads = True, group_by = 'ticker', progress = False)
+            data = yf.download(tickersArr, period = f'{self.period}d', threads = True, group_by = 'ticker', progress = False)
 
         return data
 
@@ -113,12 +114,40 @@ class Data:
                 _dictVolumes.update({i[1]: _df[i].iat[-1]})
             else:
                 _dictSMAVolumes.update({i[1]: _df[i].iat[-1]})        
-        
+
+        print(_df)
+
         return _dictVolumes, _dictSMAVolumes
     
 
+    # def _getSMAVolumes(self):
+
+
     def _getWeights(self, _tickers):
+        _dictFFMC = {}
         _dictWeights = {}
 
-        return _dictWeights
+        if self.symbol == 'NIFTY50':
+            _url = 'https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%2050'
+        elif self.symbol == 'BANKNIFTY':
+            _url = 'https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20BANK'
+        elif self.symbol == 'FINNIFTY':
+            _url = 'https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20FINANCIAL%20SERVICES'
+        # elif self.index == 'MIDCAPNIFTY': #####??????????????????????????????????????? 
+            # _url = 'https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20MIDCAP%20SELECT'
 
+        payload = self._fetchTickersFromNSE(_url)
+
+        for i in payload['data']:
+            _dictFFMC.update({f'''{i['symbol']}.NS''': i['ffmc']})
+
+        _dictFFMC.pop(next(iter(_dictFFMC)))
+
+        _sumFFMC = 0
+        for i in _dictFFMC:
+            _sumFFMC += _dictFFMC[i]
+
+        for i in _dictFFMC:
+            _dictWeights.update({i: _dictFFMC[i]/_sumFFMC})
+
+        return _dictWeights
