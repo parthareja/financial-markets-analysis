@@ -16,45 +16,108 @@ class VolumeAnalysis:
         self.period = smaLength
 
 
-    def _getPercentageWRTSimpleVolAnalysis(self, _dictVolumes, _dictSMAVolumes):
-        _indexVol = 0 
-        _indexSMAVol = 0
+    def _getVolCurrent(self, _volDF, _dictWeights):
+        _volCur = 0
+        _denominator = 0
 
-        for value in _dictVolumes.values():
-            _indexVol += value
+        for i in _volDF[f'Volume']:
+            _volN = _volDF[f'Volume'][i][-1]
+            _weightN = _dictWeights[_volDF[f'Volume'][i].name]
 
-        for valueSMA in _dictSMAVolumes.values():
-            _indexSMAVol += valueSMA
+            _volCur += _volN * _weightN
+            _denominator += 1
 
-        _percentage = (_indexVol / _indexSMAVol) * 100
+        _volCur /= _denominator
 
-        return _percentage
+        return _volCur
+    
+
+    def _getVolSMA(self, _volDF, _dictWeights, _dictCurrentVolumes = False):
+        _volSMA = 0
+        _denominator1 = 0
+
+        if _dictCurrentVolumes == True:
+            _dictCurrentVolumes = {}
+
+            for i in _volDF['Volume']:
+                _num = 0
+                _denominator = 0
+
+                for j in _volDF['Volume'][i]:
+                    _num += j * _dictWeights[i]
+                    _denominator += 1
+                _dictCurrentVolumes.update({i: j})
+
+                _volSMA += _num
+                _denominator1 += 1
+
+            _volSMA /= _denominator1
+            _volSMA /= _denominator
+
+            return _volSMA, _dictCurrentVolumes
+
+        else:
+            for i in _volDF['Volume']:
+                _num = 0
+                _denominator = 0
+
+                for j in _volDF['Volume'][i]:
+                    _num += j * _dictWeights[i]
+                    _denominator += 1
+
+                _volSMA += _num
+                _denominator1 += 1
+
+            _volSMA /= _denominator1
+            _volSMA /= _denominator
+
+            return _volSMA
+
+
+    def _getPercentageWRTSimpleVolAnalysis(self, _volDF):
+        _dictWeights = {}
+
+        for i in _volDF['Volume']:
+            _dictWeights.update({i: 1/len(_volDF['Volume'].columns)})
+
+        _volCurrent = self._getVolCurrent(_volDF, _dictWeights)
+        _volSMA, _dictCurrentVolumes = self._getVolSMA(_volDF, _dictWeights, True)
+        
+        _percentage = (_volCurrent / _volSMA) * 100
+
+        return round(_percentage, 2), _dictCurrentVolumes
+        
+
+    def _getPercentageWRTWeightedVolAnalysis(self, _volDF, _dictWeights):
+        _volCurrent = self._getVolCurrent(_volDF, _dictWeights)
+        _volSMA = self._getVolSMA(_volDF, _dictWeights)
+
+        _percentage = (_volCurrent / _volSMA) * 100
+
         return round(_percentage, 2)
 
 
-    def _getPercentageWRTWeightedVolAnalysis(self, _dictVolumes, _dictSMAVolumes):
-        pass
+    def _getDictCoVolPercentages(self, _volDF, _dictCurrentVolumes):
+        _dictCoVolPercentage = {}
+        
+        for i in _volDF[f'{self.period}d-SMA Volume']:
+            _ptg = (_dictCurrentVolumes[_volDF[f'{self.period}d-SMA Volume'][i].name] / _volDF[f'{self.period}d-SMA Volume'][i].iat[-1]) * 100
+            _dictCoVolPercentage.update({_volDF[f'{self.period}d-SMA Volume'][i].name: _ptg})
 
+        return _dictCoVolPercentage
+    
 
     def getVolumeAnalysis(self):
         dataObj = Data(self.index, self.period, False, None)
-        _tickers = dataObj._getTickers()
 
-        _dictVolumes, _dictSMAVolumes = dataObj._getVolumes(_tickers)
-        _dictWeights = dataObj._getWeights(_tickers)
+        _tickers = dataObj.getTickers()
+        _volDF = dataObj.getVolumeData(_tickers)
 
-        simple = self._getPercentageWRTSimpleVolAnalysis(_dictVolumes, _dictSMAVolumes)
-        weighted = self._getPercentageWRTWeightedVolAnalysis(_dictVolumes, _dictSMAVolumes)
+        simple, _dictCurrentVolumes = self._getPercentageWRTSimpleVolAnalysis(_volDF)
 
-        return simple, weighted
+        _dictWeights = dataObj.getWeights(_tickers)
+        weighted = self._getPercentageWRTWeightedVolAnalysis(_volDF, _dictWeights)
     
+        _dictCoVolPercentages = self._getDictCoVolPercentages(_volDF, _dictCurrentVolumes)
 
-# for viewing in terminal: pls delet when tested OK
-pd.set_option('display.max_rows', 500)
-pd.set_option('display.max_columns', 500)
-# pd.set_option('display.width', 1000)
-
-
-obj = VolumeAnalysis("BANKNIFTY", 20)
-a = obj.getVolumeAnalysis()
-print(a)
+        return simple, weighted, _dictCoVolPercentages

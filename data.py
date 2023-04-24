@@ -4,24 +4,24 @@ import requests
 
 
 class Data:
-    def __init__(self, symbol, period, getTickers, interval = None):
+    def __init__(self, symbol, period, returnTickers, interval = None):
         self.period = period
         self.interval = interval
         self.symbol = symbol
-        self.getTickers = getTickers
+        self.returnTickers = returnTickers
 
 
     def getData(self):
         indicesArr = ['NIFTY50', 'BANKNIFTY', 'FINNIFTY']
         if self.symbol in indicesArr:
-            _tickers = self._getTickers()
+            _tickers = self.getTickers()
         else:
             _tickers = [self.symbol]
 
         data = self._fetchData(_tickers)
         data = self._transformData(data)
         
-        if self.getTickers == True:
+        if self.returnTickers == True:
             return data, _tickers
         else: 
             return data
@@ -51,7 +51,7 @@ class Data:
         return output 
 
 
-    def _getTickers(self):
+    def getTickers(self):
         if self.symbol == 'NIFTY50':
             _url = 'https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%2050'
             _ownTicker = '^NSEI'
@@ -65,7 +65,7 @@ class Data:
             # _url = 'https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20MIDCAP%20SELECT'
             # _ownTicker = 0 # yet to be added: index symbol
         else:
-            exit()
+            return [self.symbol, self.symbol]
 
         payload = self._fetchTickersFromNSE(_url)
 
@@ -96,34 +96,20 @@ class Data:
         return data
     
 
-    def _getVolumes(self, _tickers):
-        _tickers = self._getTickers()
+    def getVolumeData(self, _tickers):
+        _tickers = self.getTickers()
         _tickers.pop(0)
 
-        _dictVolumes = {}
-        _dictSMAVolumes = {}
-        
-        _df = yf.download(_tickers, threads=True, period=f'{self.period}d', progress=False)
-        _df.drop(['Adj Close', 'Close', 'High', 'Low', 'Open'], inplace = True, axis = 1)
+        volDF = yf.download(_tickers, threads=True, period=f'{self.period}d', progress=False)
+        volDF.drop(['Adj Close', 'Close', 'High', 'Low', 'Open'], inplace = True, axis = 1)
 
-        for i in _df:
-            _df[(f'{self.period}d-SMA Volume', i[1])] = _df[[i]].rolling(self.period).mean()
+        for i in volDF:
+            volDF[(f'{self.period}d-SMA Volume', i[1])] = volDF[[i]].rolling(self.period).mean()    
 
-        for i in _df:
-            if i[0] == 'Volume':
-                _dictVolumes.update({i[1]: _df[i].iat[-1]})
-            else:
-                _dictSMAVolumes.update({i[1]: _df[i].iat[-1]})        
-
-        print(_df)
-
-        return _dictVolumes, _dictSMAVolumes
-    
-
-    # def _getSMAVolumes(self):
+        return volDF
 
 
-    def _getWeights(self, _tickers):
+    def getWeights(self, _tickers):
         _dictFFMC = {}
         _dictWeights = {}
 
