@@ -137,7 +137,7 @@ class Data:
             _url = 'https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20FINANCIAL%20SERVICES'
         # elif self.index == 'MIDCAPNIFTY': #####??????????????????????????????????????? 
             # _url = 'https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%20MIDCAP%20SELECT'
-
+        
         payload = self._fetchTickersFromNSE(_url)
 
         for i in payload['data']:

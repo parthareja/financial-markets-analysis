@@ -2,24 +2,29 @@ from data import Data
 
 
 class VolumeAnalysis:
-    def __init__(self, index, smaLength, interval = None):
+    def __init__(self, index, smaLength, interval = None, notAnIndex = False):
         self.index = index
         self.period = smaLength
         self.interval = interval
+        self.notAnIndex = notAnIndex
 
 
     def _getVolCurrent(self, _volDF, _dictWeights):
         _volCur = 0
         _denominator = 0
 
-        for i in _volDF[f'Volume']:
-            _volN = _volDF[f'Volume'][i][-1]
-            _weightN = _dictWeights[_volDF[f'Volume'][i].name]
+        if self.notAnIndex == True:
+            _volCur = _volDF['Volume'][-1]
 
-            _volCur += _volN * _weightN
-            _denominator += 1
+        else:
+            for i in _volDF['Volume']:
+                _volN = _volDF['Volume'][i][-1]
+                _weightN = _dictWeights[_volDF['Volume'][i].name]
 
-        _volCur /= _denominator
+                _volCur += _volN * _weightN
+                _denominator += 1
+
+            _volCur /= _denominator
 
         return _volCur
     
@@ -28,49 +33,60 @@ class VolumeAnalysis:
         _volSMA = 0
         _denominator1 = 0
 
-        if _dictCurrentVolumes == True:
-            _dictCurrentVolumes = {}
-
-            for i in _volDF['Volume']:
-                _num = 0
-                _denominator = 0
-
-                for j in _volDF['Volume'][i]:
-                    _num += j * _dictWeights[i]
-                    _denominator += 1
-                _dictCurrentVolumes.update({i: j})
-
-                _volSMA += _num
-                _denominator1 += 1
-
-            _volSMA /= _denominator1
-            _volSMA /= _denominator
+        if self.notAnIndex == True:
+            _volSMA = _volDF[(f'{self.period}d-SMA Volume', 'o')][-1]
+            _dictCurrentVolumes = None
 
             return _volSMA, _dictCurrentVolumes
-
+        
         else:
-            for i in _volDF['Volume']:
-                _num = 0
-                _denominator = 0
+            if _dictCurrentVolumes == True:
+                _dictCurrentVolumes = {}
 
-                for j in _volDF['Volume'][i]:
-                    _num += j * _dictWeights[i]
-                    _denominator += 1
+                for i in _volDF['Volume']:
+                    _num = 0
+                    _denominator = 0
 
-                _volSMA += _num
-                _denominator1 += 1
+                    for j in _volDF['Volume'][i]:
+                        _num += j * _dictWeights[i]
+                        _denominator += 1
+                    _dictCurrentVolumes.update({i: j})
 
-            _volSMA /= _denominator1
-            _volSMA /= _denominator
+                    _volSMA += _num
+                    _denominator1 += 1
 
-            return _volSMA
+                _volSMA /= _denominator1
+                _volSMA /= _denominator
+
+                return _volSMA, _dictCurrentVolumes
+
+            else:
+                for i in _volDF['Volume']:
+                    _num = 0
+                    _denominator = 0
+
+                    for j in _volDF['Volume'][i]:
+                        _num += j * _dictWeights[i]
+                        _denominator += 1
+
+                    _volSMA += _num
+                    _denominator1 += 1
+
+                _volSMA /= _denominator1
+                _volSMA /= _denominator
+
+                return _volSMA
 
 
     def _getPercentageWRTSimpleVolAnalysis(self, _volDF):
         _dictWeights = {}
 
-        for i in _volDF['Volume']:
-            _dictWeights.update({i: 1/len(_volDF['Volume'].columns)})
+        if self.notAnIndex == True:
+            _dictWeights = {self.index: 1}
+            
+        else:
+            for i in _volDF['Volume']:
+                _dictWeights.update({i: 1/len(_volDF['Volume'].columns)})
 
         _volCurrent = self._getVolCurrent(_volDF, _dictWeights)
         _volSMA, _dictCurrentVolumes = self._getVolSMA(_volDF, _dictWeights, True)
@@ -107,6 +123,9 @@ class VolumeAnalysis:
 
         simple, _dictCurrentVolumes = self._getPercentageWRTSimpleVolAnalysis(_volDF)
 
+        if self.notAnIndex == True:
+            return simple
+        
         _dictWeights = dataObj.getWeights(_tickers)
         weighted = self._getPercentageWRTWeightedVolAnalysis(_volDF, _dictWeights)
     
