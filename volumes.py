@@ -2,9 +2,10 @@ from data import Data
 
 
 class VolumeAnalysis:
-    def __init__(self, index, smaLength):
+    def __init__(self, index, smaLength, interval = None):
         self.index = index
         self.period = smaLength
+        self.interval = interval
 
 
     def _getVolCurrent(self, _volDF, _dictWeights):
@@ -97,11 +98,9 @@ class VolumeAnalysis:
 
         return _dictCoVolPercentage
     
+
     def getVolumeAnalysis(self):
-        """
-        hello world
-        """
-        dataObj = Data(self.index, self.period, False, None)
+        dataObj = Data(self.index, self.period, returnTickers=False, interval=self.interval)
 
         _tickers = dataObj.getTickers()
         _volDF = dataObj.getVolumeData(_tickers)

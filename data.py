@@ -100,7 +100,23 @@ class Data:
         _tickers = self.getTickers()
         _tickers.pop(0)
 
-        volDF = yf.download(_tickers, threads=True, period=f'{self.period + 1}d', progress=False)
+        if self.interval != None:
+            if self.interval in ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d']:#, 5d, 1wk, 1mo, 3mo]:\
+                prd = self.period
+
+            elif self.interval == '5d':
+                prd = self.period * 5
+
+            elif self.interval == '1wk':
+                prd = self.period * 7
+
+            elif self.interval == '1mo':
+                prd = self.period * 35
+
+            volDF = yf.download(_tickers, threads=True, period=f'{prd + 1}d', progress=False, interval=self.interval)
+
+        else:
+            volDF = yf.download(_tickers, threads=True, period=f'{self.period + 1}d', progress=False)
         volDF.drop(['Adj Close', 'Close', 'High', 'Low', 'Open'], inplace = True, axis = 1)
 
         for i in volDF:

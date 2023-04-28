@@ -1,6 +1,7 @@
 from data import Data
 from candle import Candle
 from scan import Scan
+from volumes import VolumeAnalysis
 
 
 class Main:
@@ -22,20 +23,16 @@ class Main:
 
     def getVolAnalysis(index, period, interval):
 
-        dataObj = Data(index, period, False, interval)
-        df = dataObj.getData()
-
-
-        # return df
-        pass
-
-
-    def getPrediction():
-        pass
+        return VolumeAnalysis(index, period, interval).getVolumeAnalysis()
 
 
     def getBacktest():
         pass
 
+
     def getStrategyOptimization():
         pass
+
+
+# period: int (in days)
+# interval: string (in [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo])
