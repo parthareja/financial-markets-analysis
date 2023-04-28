@@ -1,14 +1,5 @@
-import yfinance as yf
-# import numpy as np
-# from pandas_datareader import data
-import pandas as pd
-import pandas_datareader as web
-# import pandas as pd
-import requests
-# import sys
 from data import Data
 
-    
 
 class VolumeAnalysis:
     def __init__(self, index, smaLength):
@@ -102,12 +93,14 @@ class VolumeAnalysis:
         
         for i in _volDF[f'{self.period}d-SMA Volume']:
             _ptg = (_dictCurrentVolumes[_volDF[f'{self.period}d-SMA Volume'][i].name] / _volDF[f'{self.period}d-SMA Volume'][i].iat[-1]) * 100
-            _dictCoVolPercentage.update({_volDF[f'{self.period}d-SMA Volume'][i].name: _ptg})
+            _dictCoVolPercentage.update({_volDF[f'{self.period}d-SMA Volume'][i].name: round(_ptg, 2)})
 
         return _dictCoVolPercentage
     
-
     def getVolumeAnalysis(self):
+        """
+        hello world
+        """
         dataObj = Data(self.index, self.period, False, None)
 
         _tickers = dataObj.getTickers()

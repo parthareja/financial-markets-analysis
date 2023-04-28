@@ -100,7 +100,7 @@ class Data:
         _tickers = self.getTickers()
         _tickers.pop(0)
 
-        volDF = yf.download(_tickers, threads=True, period=f'{self.period}d', progress=False)
+        volDF = yf.download(_tickers, threads=True, period=f'{self.period + 1}d', progress=False)
         volDF.drop(['Adj Close', 'Close', 'High', 'Low', 'Open'], inplace = True, axis = 1)
 
         for i in volDF:
