@@ -1,16 +1,6 @@
 from data import Data
 from candle import Candle
 
-# symbolsList = ['HDFCBANK.NS', 'TCS.NS', 'ADANIPORTS.NS', 'APOLLOHOSP.NS', 'ASIANPAINT.NS', 'AXISBANK.NS']
-# a = Data(symbolsList, '1mo')
-
-# data = a.fetchData()
-# print(data)
-# objCandle = []
-# for ticker in symbolsList:
-#     objCandle.append(Candle(data, ticker))
-
-
 
 class Scan:
     def __init__(self, objCandle):
@@ -34,6 +24,7 @@ class Scan:
 
         return scanDictBull
     
+
     def hammer(self):
         existsArr = []
         for obj in self.objCandle:
@@ -42,6 +33,7 @@ class Scan:
 
         return existsArr
     
+
     def test(self):
         existsArr = []
         for obj in self.objCandle:
@@ -60,6 +52,7 @@ class Scan:
         # return a
         # pass
         # return self.hammer()
+
 
     def pt3(self):
             existsArr = []
@@ -83,4 +76,5 @@ class Scan:
 
         return existsArr
 
-# print(Scan.hammer())
+# ADD VOLUMES ALSO IN SCAN??? OR MAYBE ONLY FOR REQD. COMPANIES IDK
+# perhaps add volumes as a separate thingy where volumes are greater than a specific no.? idk would be kinda using the vol analysis but righso what its good hmm idk 

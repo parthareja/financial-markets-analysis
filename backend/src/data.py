@@ -4,11 +4,14 @@ import requests
 
 
 class Data:
-    def __init__(self, symbol, period, returnTickers, interval = None):
+    def __init__(self, symbol, period, returnTickers, interval = None, periodInStr = False, cleanData = False, noIndexTicker = False):
         self.period = period
         self.interval = interval
         self.symbol = symbol
         self.returnTickers = returnTickers
+        self.periodInStr = periodInStr
+        self.cleanData = cleanData
+        self.noIndexTicker = noIndexTicker
 
 
     def getData(self):
@@ -19,6 +22,8 @@ class Data:
             _tickers = [self.symbol]
 
         data = self._fetchData(_tickers)
+        if self.cleanData == True:
+             data = self._cleanData(data)
         data = self._transformData(data)
         
         if self.returnTickers == True:
@@ -77,22 +82,38 @@ class Data:
             _tickers[0] = _ownTicker
         else: 
             _tickers.pop(0)
+            return _tickers
 
+        if self.noIndexTicker == True:
+            _tickers.pop(0)
       
         return _tickers
 
 
     def _fetchData(self, tickersArr):
-        if self.interval != None: 
-            data = yf.download(tickersArr, period = f'{self.period}d', interval = self.interval, threads = True, group_by = 'ticker', progress = False)
+        if self.periodInStr == True:
+            prd = self.period
         else:
-            data = yf.download(tickersArr, period = f'{self.period}d', threads = True, group_by = 'ticker', progress = False)
+            prd = f'{self.period}d'
+
+        if self.interval != None: 
+            data = yf.download(tickersArr, period = prd, interval = self.interval, threads = True, group_by = 'ticker', progress = False)
+        else:
+            data = yf.download(tickersArr, period = prd, threads = True, group_by = 'ticker', progress = False)
 
         return data
 
 
     def _transformData(self, data): 
         # transform as per requirements, the pandas dataframe
+        return data
+    
+
+    def _cleanData(self, data):
+        for i in data:
+            if data[i].isnull().sum() > 0:
+                data[i].fillna(data[i].rolling(20, min_periods = 1).mean(), inplace = True)
+
         return data
     
 
