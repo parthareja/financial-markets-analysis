@@ -134,10 +134,12 @@ class Data:
             elif self.interval == '1mo':
                 prd = self.period * 35
 
-            volDF = yf.download(_tickers, threads=True, period=f'{prd + 1}d', progress=False, interval=self.interval)
+            # volDF = yf.download(_tickers, threads=True, period=f'{prd + 1}d', progress=False, interval=self.interval)
+            volDF = yf.download(_tickers, threads=True, period=f'{prd}d', progress=False, interval=self.interval)
 
         else:
-            volDF = yf.download(_tickers, threads=True, period=f'{self.period + 1}d', progress=False)
+            # volDF = yf.download(_tickers, threads=True, period=f'{self.period + 1}d', progress=False)
+            volDF = yf.download(_tickers, threads=True, period=f'{self.period}d', progress=False)
         volDF.drop(['Adj Close', 'Close', 'High', 'Low', 'Open'], inplace = True, axis = 1)
 
         for i in volDF:
@@ -174,3 +176,19 @@ class Data:
             _dictWeights.update({i: _dictFFMC[i]/_sumFFMC})
 
         return _dictWeights
+    
+
+    def getVolDataForBacktest(self, start, end, tickers, SMALen):
+        tickers.pop(0)
+
+        volDF = yf.download(tickers, threads=True, start=start, end=end, progress=False, interval=self.interval)
+        volDF.drop(['Adj Close', 'Close', 'High', 'Low', 'Open'], inplace = True, axis = 1)
+
+        for i in volDF:
+            volDF[(f'{self.period}d-SMA Volume', i[1])] = volDF[[i]].rolling(self.period).mean()    
+
+        # print('-30950249-050-42d0-50394-')
+        # print()
+        # \.loc
+
+        return volDF[-SMALen:]

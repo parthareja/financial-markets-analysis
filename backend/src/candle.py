@@ -1,24 +1,28 @@
 class Candle:
-    def __init__(self, dataframe, ticker):
-        self.data = dataframe
-        self.ticker = ticker
-        
-    def open(self, index):
-        return self.data.iat[index - 1, self.data.columns.get_loc((self.ticker, 'Open'))]
+    def __init__(self, dataframe):
+        self.df = dataframe
 
-    def close(self, index):
-        return self.data.iat[index - 1, self.data.columns.get_loc((self.ticker, 'Close'))]
+    
+    def open(self, _index):
+        return self.df.iat[_index - 1, self.df.columns.get_loc('Open')]
+    
+    
+    def close(self, _index):
+        return self.df.iat[_index - 1, self.df.columns.get_loc('Close')]
+    
 
-    def high(self, index):
-        return self.data.iat[index - 1, self.data.columns.get_loc((self.ticker, 'High'))]
+    def high(self, _index):
+        return self.df.iat[_index - 1, self.df.columns.get_loc('High')]
+    
 
-    def low(self, index):        
-        return self.data.iat[index - 1, self.data.columns.get_loc((self.ticker, 'Low'))]
+    def low(self, _index):        
+        return self.df.iat[_index - 1, self.df.columns.get_loc('Low')]
+    
 
-    def colour(self, index):
-        if self.close(index) > self.open(index):
+    def colour(self, _index):
+        if self.close(_index) > self.open(_index):
             colour = 'GREEN'
-        elif self.close(index) < self.open(index):
+        elif self.close(_index) < self.open(_index):
             colour = 'RED'
         else:
             colour = 'NA'
