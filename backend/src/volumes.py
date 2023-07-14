@@ -115,18 +115,22 @@ class VolumeAnalysis:
         return _dictCoVolPercentage
     
 
-    def getVolumeAnalysis(self):
+    def getVolumeAnalysis(self, start = 0, end = 0, SMALen = 0):
         dataObj = Data(self.index, self.period, returnTickers=False, interval=self.interval)
+        tickers = dataObj.getTickers()
 
-        _tickers = dataObj.getTickers()
-        _volDF = dataObj.getVolumeData(_tickers)
+        if start == 0 and end == 0:
+            _volDF = dataObj.getVolumeData(tickers)
+
+        else:
+            _volDF = dataObj.getVolDataForBacktest(start, end, tickers, SMALen)
 
         simple, _dictCurrentVolumes = self._getPercentageWRTSimpleVolAnalysis(_volDF)
 
         if self.notAnIndex == True:
             return simple
         
-        _dictWeights = dataObj.getWeights(_tickers)
+        _dictWeights = dataObj.getWeights()
         weighted = self._getPercentageWRTWeightedVolAnalysis(_volDF, _dictWeights)
     
         _dictCoVolPercentages = self._getDictCoVolPercentages(_volDF, _dictCurrentVolumes)
