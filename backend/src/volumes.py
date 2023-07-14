@@ -130,7 +130,7 @@ class VolumeAnalysis:
         if self.notAnIndex == True:
             return simple
         
-        _dictWeights = dataObj.getWeights(tickers)
+        _dictWeights = dataObj.getWeights()
         weighted = self._getPercentageWRTWeightedVolAnalysis(_volDF, _dictWeights)
     
         _dictCoVolPercentages = self._getDictCoVolPercentages(_volDF, _dictCurrentVolumes)

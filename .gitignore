@@ -1,9 +1,2 @@
-test.py
-test2.py
-.DS_Store
 __pycache__
-backend/src/test7.py
-backend/src/test6.py
-backend/src/test5.py
-backend/src/test4.py
-backend/src/test3.py
+.DS_Store

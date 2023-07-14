@@ -148,7 +148,7 @@ class Data:
         return volDF
 
 
-    def getWeights(self, _tickers):
+    def getWeights(self):
         _dictFFMC = {}
         _dictWeights = {}
 
@@ -186,9 +186,5 @@ class Data:
 
         for i in volDF:
             volDF[(f'{self.period}d-SMA Volume', i[1])] = volDF[[i]].rolling(self.period).mean()    
-
-        # print('-30950249-050-42d0-50394-')
-        # print()
-        # \.loc
 
         return volDF[-SMALen:]
